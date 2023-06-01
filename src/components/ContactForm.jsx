@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import container from './container.module.css';
 
 export class ContactForm extends Component {
   render() {
     const { submit } = this.props;
     return (
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className={container}>
         <label>Name</label>
         <input
           type="text"
