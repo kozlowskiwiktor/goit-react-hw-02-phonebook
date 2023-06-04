@@ -16,47 +16,71 @@ export class App extends Component {
     name: '',
     number: '',
   };
+
+  handleSubmit = evt => {
+    evt.preventDefault();
+    const form = evt.currentTarget;
+    const nameValue = form.elements[0].value;
+    const number = form.elements[1].value;
+    form.reset();
+
+    this.setState({
+      contacts: [
+        ...this.state.contacts,
+        {
+          name: nameValue,
+          id: nanoid(),
+          number: number,
+        },
+      ],
+      filter: '',
+    });
+
+    return this.state.contacts.map(contact => {
+      if (contact.name === nameValue) {
+        this.setState({
+          contacts: this.state.contacts,
+        });
+        return alert(`${nameValue} is already in contacts`);
+      }
+      return null;
+    });
+  };
+
+  filterUsers = evt => {
+    this.setState({
+      filter: evt.target.value.toUpperCase(),
+    });
+  };
+
+  getFilteredContacts = () => {
+    const { contacts, filter } = this.state;
+    if (filter === '') {
+      return contacts;
+    }
+    return contacts.filter(contact =>
+      contact.name.toUpperCase().includes(filter)
+    );
+  };
+
+  handleRemove = id => {
+    const newContacts = this.state.contacts.filter(
+      contact => contact.id !== id
+    );
+    this.setState({ contacts: newContacts });
+  };
+
   render() {
-    const handleSubmit = evt => {
-      evt.preventDefault();
-      const form = evt.currentTarget;
-      const nameValue = form.elements[0].value;
-      const number = form.elements[1].value;
-
-      this.setState({
-        contacts: [
-          ...this.state.contacts,
-          {
-            name: nameValue,
-            id: nanoid(),
-            number: number,
-          },
-        ],
-        filter: '',
-      });
-
-      return this.state.contacts.map(contact => {
-        if (contact.name === nameValue) {
-          this.setState({
-            contacts: this.state.contacts,
-          });
-          return alert(`${nameValue} is already in contacts`);
-        }
-        return null;
-      });
-    };
-    const filterUsers = evt => {
-      this.setState({
-        filter: evt.target.value.toUpperCase(),
-      });
-    };
     return (
       <>
         <h2>Phonebook</h2>
-        <ContactForm submit={handleSubmit} />
+        <ContactForm submit={this.handleSubmit} />
         <h2>Contacts</h2>
-        <Filter filterUsers={filterUsers} />
-        <ContactList state={this.state} />
+        <Filter filterUsers={this.filterUsers} />
+        <ContactList
+          contacts={this.getFilteredContacts()}
+          onDeleteContact={this.handleRemove}
+        />
       </>
     );
   }
